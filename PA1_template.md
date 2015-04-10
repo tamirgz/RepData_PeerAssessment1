@@ -16,14 +16,16 @@ The variables included in this dataset are:
 ## Loading and preprocessing the data
 
 First we will load the data.
-```{r load data, message=FALSE, warning=FALSE}
+
+```r
 library(dplyr)
 library(ggplot2)
 data <- read.csv("activity.csv")
 ```
   
 Calculate number of total steps for each day and plot an histogram:
-```{r calc total steps & plot histogram}
+
+```r
 sumByDate <- summarise(group_by(data,date),TotalSteps = sum(steps,na.rm = TRUE))
 
 hist(sumByDate$TotalSteps,breaks = 50, 
@@ -36,41 +38,70 @@ legend("topright",
         lty=c(1,1),
         lwd=c(2.5,2.5),col=c("blue","green"))
 ```
+
+![plot of chunk calc total steps & plot histogram](figure/calc total steps & plot histogram-1.png) 
   
 The mean and median of the total number of steps were calculated as following:
-```{r calc mean and median}
+
+```r
 mean(sumByDate$TotalSteps)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(sumByDate$TotalSteps)
+```
+
+```
+## [1] 10395
 ```
   
 ## Imputing missing values
 
 In this part we were required to plot an average of steps taken as function of 5-minute intervals.
 Therefore, we will first group the data by 5-minute invervals and then calculate an average per interval.
-```{r group by intervals and calc average}
+
+```r
 averageByInterval <- summarise(group_by(data,interval),average = mean(steps,na.rm = TRUE))
 ```
   
 The 5-minute interval in which the average of total steps is maximal is:
-```{r max interval calc}
+
+```r
 averageByInterval$interval[which.max(averageByInterval$average)]
+```
+
+```
+## [1] 835
 ```
   
 Using the calculated data we will plot the average number of steps per 5-minute interval
-```{r plot average per interval}
+
+```r
 plot(averageByInterval$interval,averageByInterval$average,type="l",
      main = "Graph of average steps per interval",
      xlab = "5-minute interval", ylab = "Average number of steps")
 ```
+
+![plot of chunk plot average per interval](figure/plot average per interval-1.png) 
   
 As requested, number of rows containing "NA" is given by:
-```{r calc number of NAs}
+
+```r
 sum(is.na(data$steps))
+```
+
+```
+## [1] 2304
 ```
   
 I will replace the number of steps where the steps is "NA" in an average value of steps for the related interval of the replaced row.  
 **dataImputed** is the variable name that will hold the same data holded in original table **data** but with imputed missing values
-```{r Imputind missing values}
+
+```r
 dataImputed <- data
 naIndices <- which(is.na(data$steps))
 for (i in naIndices) {
@@ -79,7 +110,8 @@ for (i in naIndices) {
 ```
   
 Now let's repeat the plots and calculations on the new data (with imputed missing values):
-```{r plot histogram for new data}
+
+```r
 sumByDateImputed <- summarise(group_by(dataImputed,date),TotalSteps = sum(steps,na.rm = TRUE))
 
 hist(sumByDateImputed$TotalSteps,breaks = 50, 
@@ -92,11 +124,25 @@ legend("topright",
         lty=c(1,1),
         lwd=c(2.5,2.5),col=c("blue","green"))
 ```
+
+![plot of chunk plot histogram for new data](figure/plot histogram for new data-1.png) 
   
 The mean and median on the data with the imputed missing values were calculated as following:
-```{r calc mean and median imputed}
+
+```r
 mean(sumByDateImputed$TotalSteps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(sumByDateImputed$TotalSteps)
+```
+
+```
+## [1] 10766.19
 ```
   
   
@@ -104,8 +150,8 @@ Results comparison:
 
 data type|   mean    |   median
 ---------|-----------|----------
-original |   `r mean(sumByDate$TotalSteps)`     |  `r median(sumByDate$TotalSteps)`
-imputed  |   `r mean(sumByDateImputed$TotalSteps)`     |  `r median(sumByDateImputed$TotalSteps)`
+original |   9354.2295082     |  10395
+imputed  |   1.0766189 &times; 10<sup>4</sup>     |  1.0766189 &times; 10<sup>4</sup>
 
 According to the results in the comparison table presented above we can see that imputation of the missing values caused two modifications:  
 1. The mean value was changed  
@@ -116,20 +162,23 @@ According to the results in the comparison table presented above we can see that
 I will create a new variable that is a replicate of the data with imputed missing values.  
 Then add a new column called *day_type* that will be *weekend* or *weekday* according to the date.
 
-```{r data with weekdays}
+
+```r
 dataWeekdays <- data
 dataWeekdays[,"day_type"] <- rep(0,nrow(dataWeekdays))
 dataWeekdays[,"day_type"] <- (weekdays(as.Date(dataWeekdays$date)) == "Saturday") |
                              (weekdays(as.Date(dataWeekdays$date)) == "Sunday")
 dataWeekdays[dataWeekdays$day_type == FALSE,"day_type"] <- "weekday"
 dataWeekdays[dataWeekdays$day_type == TRUE,"day_type"] <- "weekend"
-
 ```
   
 At last, I will group the new constructed data by weekday/weekend type and then calculate mean for each of 5-minute intervals:
-```{r day type plot with panels}
+
+```r
 dataWeekdaysGrouped <- summarise(group_by(dataWeekdays,day_type,interval),average = mean(steps,na.rm = TRUE))
     
 qplot(interval,average,data=dataWeekdaysGrouped,geom="line",facets=.~day_type,
       ylab="average number of steps", xlab="5-minute invterval")
 ```
+
+![plot of chunk day type plot with panels](figure/day type plot with panels-1.png) 
