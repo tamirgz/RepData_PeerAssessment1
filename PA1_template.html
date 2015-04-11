@@ -203,7 +203,7 @@ hr {
 <body>
 <p>This is the a report that contains all the required information for &ldquo;Peer Assessment 1&rdquo; assignment.<br/>
 The raw data was downloaded from <a href="https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip">https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip</a>.<br/>
-<strong>The raw data has to be unzipped into the *work directory</strong>*  </p>
+<strong>The raw data has to be in the *work directory</strong>*  </p>
 
 <p>The variables included in this dataset are:  </p>
 
@@ -219,6 +219,7 @@ The raw data was downloaded from <a href="https://d396qusza40orc.cloudfront.net/
 
 <pre><code class="r">library(dplyr)
 library(ggplot2)
+unzip(&quot;activity.zip&quot;)
 data &lt;- read.csv(&quot;activity.csv&quot;)
 </code></pre>
 

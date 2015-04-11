@@ -6,7 +6,7 @@ output:
 
 This is the a report that contains all the required information for "Peer Assessment 1" assignment.  
 The raw data was downloaded from <https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip>.  
-**The raw data has to be unzipped into the *work directory***  
+**The raw data has to be in the *work directory***  
 
 The variables included in this dataset are:  
 * **steps**: Number of steps taking in a 5-minute interval (missing values are coded as NA)  
@@ -20,6 +20,7 @@ First we will load the data.
 ```r
 library(dplyr)
 library(ggplot2)
+unzip("activity.zip")
 data <- read.csv("activity.csv")
 ```
   
