@@ -4,7 +4,7 @@ output:
   html_document: default
 ---
 
-This is the a report that contains all the required information for "Peer Assessment 1" assignment.  
+This report contains all the required information for "Peer Assessment 1" assignment.  
 The raw data was downloaded from <https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip>.  
 **The raw data has to be in the *work directory***  
 
@@ -13,9 +13,9 @@ The variables included in this dataset are:
 * **date**: The date on which the measurement was taken in YYYY-MM-DD format  
 * **interval**: Identifier for the 5-minute interval in which measurement was taken  
 
-## Loading and preprocessing the data
+## Loading, preprocessing the data and analysis
 
-First we will load the data.
+First I will unzip and load the data.
 
 ```r
 library(dplyr)
@@ -24,12 +24,13 @@ unzip("activity.zip")
 data <- read.csv("activity.csv")
 ```
   
-Calculate number of total steps for each day and plot an histogram:
+Calculate number of total steps for each day and plot an histogram (I have chosen to break the histogram to 50 bins to get good resolution):
 
 ```r
 sumByDate <- summarise(group_by(data,date),TotalSteps = sum(steps,na.rm = TRUE))
 
 hist(sumByDate$TotalSteps,breaks = 50, 
+     col="red",
      main = paste("Histogram of total steps in day"), 
      xlab = "Total Steps")
 abline(v=mean(sumByDate$TotalSteps),col="blue",lwd=2)
@@ -60,10 +61,9 @@ median(sumByDate$TotalSteps)
 ## [1] 10395
 ```
   
-## Imputing missing values
 
 In this part we were required to plot an average of steps taken as function of 5-minute intervals.
-Therefore, we will first group the data by 5-minute invervals and then calculate an average per interval.
+Therefore, I will first group the data by 5-minute invervals and then calculate an average per interval.
 
 ```r
 averageByInterval <- summarise(group_by(data,interval),average = mean(steps,na.rm = TRUE))
@@ -84,7 +84,8 @@ Using the calculated data we will plot the average number of steps per 5-minute 
 ```r
 plot(averageByInterval$interval,averageByInterval$average,type="l",
      main = "Graph of average steps per interval",
-     xlab = "5-minute interval", ylab = "Average number of steps")
+     xlab = "5-minute interval", ylab = "Average number of steps",
+     col="blue")
 ```
 
 ![plot of chunk plot average per interval](figure/plot average per interval-1.png) 
@@ -99,7 +100,10 @@ sum(is.na(data$steps))
 ## [1] 2304
 ```
   
-I will replace the number of steps where the steps is "NA" in an average value of steps for the related interval of the replaced row.  
+## Imputing missing values
+  
+The imputation rule is :  
+Replacement of NAs with the average of number of steps for the relevant 5-minute interval.  
 **dataImputed** is the variable name that will hold the same data holded in original table **data** but with imputed missing values
 
 ```r
@@ -117,7 +121,8 @@ sumByDateImputed <- summarise(group_by(dataImputed,date),TotalSteps = sum(steps,
 
 hist(sumByDateImputed$TotalSteps,breaks = 50, 
      main = paste("Histogram of total steps in day - With imputed missing values"), 
-     xlab = "Total Steps")
+     xlab = "Total Steps",
+     col="red")
 abline(v=mean(sumByDateImputed$TotalSteps),col="blue",lwd=2)
 abline(v=median(sumByDateImputed$TotalSteps),col="green",lwd=2)
 legend("topright",
